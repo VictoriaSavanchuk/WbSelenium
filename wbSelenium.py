@@ -8,7 +8,7 @@ import telebot
 import schedule
 
 
-bot = telebot.TeleBot('your token')
+bot = telebot.TeleBot('6060217447:AAEXRJtEWyAo7Z3IYjYnZJTKqBuidqkJeMs')
 
 excel_file_path = 'sku.xlsx'
 
@@ -45,12 +45,12 @@ for sku in sku_list:
         if int(stars) < 4:            
             review_text = review.find_element(By.CLASS_NAME,'j-feedback__text').text
             
-    negative_reviews.append({'sku': sku, 'product_name': product_name, 'rating': rating, 'review_text': review_text})    
+            negative_reviews.append({'sku': sku, 'product_name': product_name, 'rating': rating, 'review_text': review_text})    
     
-    print(negative_reviews)       
-   
-    message = f"Негативный отзыв\nНазвание товара: {product_name}\nSKU товара: {sku}\nКоличество звезд: {stars}\nТекст отзыва: {review_text}\nТекущий рейтинг товара: {rating}"
-    bot.send_message(468713030, message)
+            print(negative_reviews)       
+        
+            message = f"Негативный отзыв\nНазвание товара: {product_name}\nSKU товара: {sku}\nКоличество звезд: {stars}\nТекст отзыва: {review_text}\nТекущий рейтинг товара: {rating}"
+            bot.send_message(468713030, message)
    
     time.sleep(2)
 driver.quit()
