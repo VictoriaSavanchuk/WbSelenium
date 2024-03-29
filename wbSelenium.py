@@ -13,6 +13,24 @@ bot = telebot.TeleBot('your token')
 excel_file_path = 'sku.xlsx'
 
 driver = webdriver.Edge(executable_path='msedgedriver.exe')
+# Список для хранения отправленных отзывов
+sent_reviews = []
+
+def load_sent_reviews():
+    # Загрузка отправленных отзывов из файла или базы данных
+    try:
+        with open('sent_reviews.txt', 'r',  encoding='utf-8') as file:
+            for line in file:
+                sent_reviews.append(line.strip())
+    except FileNotFoundError:
+        pass
+
+def save_sent_reviews():
+    # Сохранение отправленных отзывов в файл или базу данных
+    with open('sent_reviews.txt', 'w', encoding='utf-8') as file:
+        for review in sent_reviews:
+            file.write(review + '\n')
+
 
 def process_sku():
     workbook = load_workbook(excel_file_path)
@@ -45,19 +63,22 @@ def process_sku():
             stars = stars.get_attribute('class').split(' ')[2][4]
             if int(stars) < 4:            
                 review_text = review.find_element(By.CLASS_NAME,'j-feedback__text').text
-                
-                negative_reviews.append({'sku': sku, 'product_name': product_name, 'rating': rating, 'review_text': review_text})    
-        
-                print(negative_reviews)       
-            
-                message = f"Негативный отзыв\nНазвание товара: {product_name}\nSKU товара: {sku}\nКоличество звезд: {stars}\nТекст отзыва: {review_text}\nТекущий рейтинг товара: {rating}"
-                bot.send_message(468713030, message)
+                negative_reviews.append({'sku': sku, 'product_name': product_name, 'rating': rating, 'review_text': review_text})  
+                #print(negative_reviews)       
+                review_id = f'{sku}_{stars}_{review_text}'  # Генерация уникального идентификатора отзыва
+                if review_id not in sent_reviews:  # Проверка, отправлен ли отзыв ранее
+                    sent_reviews.append(review_id)  # Добавление отзыва в список отправленных
+                    message = f"Негативный отзыв\nНазвание товара: {product_name}\nSKU товара: {sku}\nКоличество звезд: {stars}\nТекст отзыва: {review_text}\nТекущий рейтинг товара: {rating}"
+                    bot.send_message('CHAT_ID', message)
     
         time.sleep(2)
     driver.quit()
+    save_sent_reviews()
 
 # Расписание выполнения задачи
-schedule.every().day.at("20:59").do(process_sku)  
+schedule.every().day.at("10:27").do(process_sku)  
+
+load_sent_reviews()  # Загрузка отправленных отзывов перед запуском программы
 
 # Запуск цикла обработки расписания
 while True:
