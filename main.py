@@ -7,7 +7,6 @@ from openpyxl import load_workbook
 import telebot
 import schedule
 
-
 bot = telebot.TeleBot('your token')
 
 excel_file_path = 'sku.xlsx'
@@ -31,12 +30,9 @@ def save_sent_reviews():
         for review in sent_reviews:
             file.write(review + '\n')
 
-
 def process_sku():
     workbook = load_workbook(excel_file_path)
     sheet = workbook.active
-
-
     sku_column = sheet['A']
     sku_list = [sku.value for sku in sku_column if sku.value is not None]
 
